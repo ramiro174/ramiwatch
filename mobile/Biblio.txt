@@ -1,0 +1,5 @@
+//Lectura de Sensores.
+https://developers.google.com/fit/android/sensors
+
+//Mandada de Notificaciones.
+
