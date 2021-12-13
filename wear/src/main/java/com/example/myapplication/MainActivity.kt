@@ -46,8 +46,7 @@ class MainActivity : Activity() , SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent) {
-        // The light sensor returns a single value.
-        // Many sensors return 3 values, one for each axis.
+
         val lux = event.values[0]
 
         findViewById<TextView>(R.id.luz_contenido).setText(lux.toString())
@@ -55,7 +54,6 @@ class MainActivity : Activity() , SensorEventListener {
     }
 
     override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
-        // Do something here if sensor accuracy changes.
     }
 
     override fun onResume() {
@@ -96,12 +94,4 @@ class MainActivity : Activity() , SensorEventListener {
             notificationManager.createNotificationChannel(channel)
         }
     }
-
-    // Create a data map and put data in it
-    private fun increaseCounter() {
-
-    }
-
-
-
 }

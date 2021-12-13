@@ -6,14 +6,17 @@ import android.content.Context
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.myapplication.R
 import com.google.android.gms.common.api.GoogleApiClient
-import com.google.android.gms.wearable.Node
+import com.google.android.gms.common.data.FreezableUtils
+import com.google.android.gms.wearable.*
 
+private const val COUNT_KEY = "com.example.key.count"
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() , DataClient.OnDataChangedListener {
     private lateinit var client: GoogleApiClient
     private var connectedNode: List<Node>? = null
 
@@ -42,16 +45,53 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    public fun mandarNotificacion(desu:android.view.View)
+    public fun mandarNotificacion(Contenido: String)
     {
         var notif = NotificationCompat.Builder(this, "CHANNEL_ID")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("NOTIFICACIÓN")
-            .setContentText("Esto es una notificación")
+            .setContentText(Contenido)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT).build();
 
         var notificationManagerCompat = NotificationManagerCompat.from(this);
         notificationManagerCompat.notify("",11 ,notif );
 
     }
+
+    private var count = 0
+
+    override fun onResume() {
+        super.onResume()
+        Wearable.getDataClient(this).addListener(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Wearable.getDataClient(this).removeListener(this)
+    }
+
+    override fun onDataChanged(dataEvents: DataEventBuffer) {
+        dataEvents.forEach { event ->
+            // DataItem changed
+            if (event.type == DataEvent.TYPE_CHANGED) {
+                event.dataItem.also { item ->
+                    if (item.uri.path?.compareTo("/count") == 0) {
+                        DataMapItem.fromDataItem(item).dataMap.apply {
+                            updateCount(getInt(COUNT_KEY))
+                        }
+                    }
+                }
+            } else if (event.type == DataEvent.TYPE_DELETED) {
+                // DataItem deleted
+            }
+        }
+    }
+
+    private fun updateCount(int: Int) {
+        findViewById<TextView>(R.id.pasos_contenido).setText(int.toString())
+        mandarNotificacion(int.toString())
+    }
+
+
+
 }
